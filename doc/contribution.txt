@@ -1,0 +1,40 @@
+MILESTONE 1:
+
+Li Che Hsu:
+Designed “if else” grammar
+Overview of language
+
+Karan Navin Javali:
+Designed the “while” and “for” grammar
+Created the GitHub repo
+Wrote data structures used
+
+Yunhan Qiao:
+Designed operators, primitive types, and assignment operators
+Information of Interpreter
+
+Aaditya Muley:
+Designed the grammar for expressions, relational and logical operators, and ternary operators
+Restructured the grammar to take into account left-recursion and precedence rules
+Information for the interpreter to be used, parsing techniques, and Abstract syntax tree (AST)
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+MILESTONE 2:(Temporary Future Plan)
+Li Che Hsu:
+Work on “if else” evaluator
+Develop Test cases
+
+Karan Navin Javali:
+Work on “for” and “while” grammar
+Work on other tasks as required.
+
+Yunhan Qiao:
+Work on operators, primitive types, and assignment operators evaluator
+Do the lexical analyzer and parser
+
+Aaditya Muley:
+Update grammar as required
+Evaluator for relational, logical operators, and ternary operator
+Work on ANTLR to develop a parser and lexer if we decide to go with ANTLR
+Work on presentation and YouTube video
