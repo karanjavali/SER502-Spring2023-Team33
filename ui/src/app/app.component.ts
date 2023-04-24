@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { FormControl } from '@angular/forms';
 
 @Component({
   selector: 'app-root',
@@ -6,5 +7,15 @@ import { Component } from '@angular/core';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
-  title = 'ui';
+  codeInput:any;
+  output = '';
+  ngOnInit() {
+    this.codeInput = new FormControl('');
+  }
+
+  onRun() {
+    console.log(this.codeInput.value);
+    this.output = this.codeInput.value;
+    
+  }
 }
