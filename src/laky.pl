@@ -3,53 +3,11 @@
 :- table expression/3, temp1/3.
 
 
-variable(x) --> [x].
-variable(y) --> [y].
-variable(z) --> [z].
-variable(u) --> [u].
-variable(v) --> [v].
+variable(t_var(X)) --> [X], { atom(X) }.
 
-number(t_digit(X)) --> digit(X).
-number(t_digit(X,Y)) --> digit(X), number(Y).
-digit(0) --> [0].
-digit(1) --> [1].
-digit(2) --> [2].
-digit(3) --> [3].
-digit(4) --> [4].
-digit(5) --> [5].
-digit(6) --> [6].
-digit(7) --> [7].
-digit(8) --> [8].
-digit(9) --> [9].
+digit(t_digit(X)) --> [X], { number(X) }.
 
-string(t_string(X)) --> chars(X).
-string(t_string(X,Y)) --> chars(X), string(Y).
-chars(a) --> [a].
-chars(b) --> [b].
-chars(c) --> [c].
-chars(d) --> [d].
-chars(e) --> [e].
-chars(f) --> [f].
-chars(g) --> [g].
-chars(h) --> [h].
-chars(i) --> [i].
-chars(j) --> [j].
-chars(k) --> [k].
-chars(l) --> [l].
-chars('m') --> ['m'].
-chars(n) --> [n].
-chars(o) --> [o].
-chars(p) --> [p].
-chars('q') --> ['q'].
-chars(r) --> [r].
-chars('s') --> ['s'].
-chars(t) --> [t].
-chars(u) --> [u].
-chars(v) --> [v].
-chars(w) --> [w].
-chars(x) --> [x].
-chars(y) --> [y].
-chars(z) --> [z].
+string(t_string(X)) --> [X], { atom(X) }.
 
 boolean(t_boolean(true)) --> [true].
 boolean(t_boolean(false)) --> [false].
@@ -67,13 +25,14 @@ relational(!) --> [!].
 
 program(t_program(X)) --> block(X), ['.'].
 
+block(t_block(X)) --> [begin], declare(X), [end].
 block(t_block(X,Y)) --> [begin], declare(X), [;], command(Y), [end].
 
 
 declare(t_declare(X,Y)) --> declare1(X), [;], declare(Y).
 declare(X) --> declare1(X).
 
-declare1(t_const(X,Y)) --> [int], variable(X), [=], number(Y).
+declare1(t_const(X,Y)) --> [int], variable(X), [=], digit(Y).
 declare1(t_const(X)) --> [int], variable(X).
 
 declare1(t_string(X,Y)) --> [string], variable(X), [=], ['"'], string(Y), ['"'].
@@ -97,7 +56,7 @@ command1(t_ternary(X,Y,Z)) --> [tern], boolean(X), [?], command(Y), [:], command
 command1(t_ternary(X,Y,Z)) --> [tern], command1(X), [?], command(Y), [:], command(Z), [endtern].
 
 command1(t_for_javatype(X,Y,Z)) --> [for], command1(X), command1(Y), ['{'], command(Z), ['}'], [endforjava].
-command1(t_for_pythontype(W,X,Y,Z)) --> [for], variable(W), [inrange], number(X), number(Y), ['{'], command(Z), ['}'], [endforpython].
+command1(t_for_pythontype(W,X,Y,Z)) --> [for], variable(W), [inrange], digit(X), digit(Y), ['{'], command(Z), ['}'], [endforpython].
 
 command1(t_while(X,Y)) --> [while], boolean(X), [do], command(Y), [endwhile].
 command1(t_while(X,Y)) --> [while], command1(X), [do], command(Y), [endwhile].
@@ -114,4 +73,4 @@ temp1(X) --> temp2(X).
 temp2(t_parenthesis(X)) --> ['('], expression(X), [')'].
 temp2(t_assign(X,Y)) --> variable(X), [:=], expression(Y).
 temp2(t_variable(X)) --> variable(X).
-temp2(t_number(X)) --> number(X).
+temp2(t_digit(X)) --> digit(X).
