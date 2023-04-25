@@ -9,17 +9,21 @@ variable(z) --> [z].
 variable(u) --> [u].
 variable(v) --> [v].
 
-number(0) --> [0].
-number(1) --> [1].
-number(2) --> [2].
-number(3) --> [3].
-number(4) --> [4].
-number(5) --> [5].
-number(6) --> [6].
-number(7) --> [7].
-number(8) --> [8].
-number(9) --> [9].
+number(t_digit(X)) --> digit(X).
+number(t_digit(X,Y)) --> digit(X), number(Y).
+digit(0) --> [0].
+digit(1) --> [1].
+digit(2) --> [2].
+digit(3) --> [3].
+digit(4) --> [4].
+digit(5) --> [5].
+digit(6) --> [6].
+digit(7) --> [7].
+digit(8) --> [8].
+digit(9) --> [9].
 
+string(t_string(X)) --> chars(X).
+string(t_string(X,Y)) --> chars(X), string(Y).
 chars(a) --> [a].
 chars(b) --> [b].
 chars(c) --> [c].
@@ -65,14 +69,19 @@ program(t_program(X)) --> block(X), ['.'].
 
 block(t_block(X,Y)) --> [begin], declare(X), [;], command(Y), [end].
 
+
 declare(t_declare(X,Y)) --> declare1(X), [;], declare(Y).
 declare(X) --> declare1(X).
+
 declare1(t_const(X,Y)) --> [int], variable(X), [=], number(Y).
 declare1(t_const(X)) --> [int], variable(X).
-declare1(t_string(X,Y)) --> [string], variable(X), [=], ['"'], chars(Y), ['"'].
+
+declare1(t_string(X,Y)) --> [string], variable(X), [=], ['"'], string(Y), ['"'].
 declare1(t_string(X)) --> [string], variable(X).
+
 declare1(t_bool(X,Y)) --> [bool], variable(X), [=], boolean(Y).
 declare1(t_bool(X)) --> [bool], variable(X).
+
 
 command(t_command(X,Y)) --> command1(X), [;], command(Y).
 command(X) --> command1(X).
@@ -94,6 +103,7 @@ command1(t_while(X,Y)) --> [while], boolean(X), [do], command(Y), [endwhile].
 command1(t_while(X,Y)) --> [while], command1(X), [do], command(Y), [endwhile].
 
 command1(X) --> block(X).
+
 
 expression(t_add(X,Y)) --> expression(X), [+], temp1(Y).
 expression(t_sub(X,Y)) --> expression(X), [-], temp1(Y).
