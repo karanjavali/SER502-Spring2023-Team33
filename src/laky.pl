@@ -1,58 +1,107 @@
+:- use_rendering(svgtree).
+
+:- table expression/3, temp1/3.
+
+
+variable(x) --> [x].
+variable(y) --> [y].
+variable(z) --> [z].
+variable(u) --> [u].
+variable(v) --> [v].
+
+number(0) --> [0].
+number(1) --> [1].
+number(2) --> [2].
+number(3) --> [3].
+number(4) --> [4].
+number(5) --> [5].
+number(6) --> [6].
+number(7) --> [7].
+number(8) --> [8].
+number(9) --> [9].
+
+chars(a) --> [a].
+chars(b) --> [b].
+chars(c) --> [c].
+chars(d) --> [d].
+chars(e) --> [e].
+chars(f) --> [f].
+chars(g) --> [g].
+chars(h) --> [h].
+chars(i) --> [i].
+chars(j) --> [j].
+chars(k) --> [k].
+chars(l) --> [l].
+chars('m') --> ['m'].
+chars(n) --> [n].
+chars(o) --> [o].
+chars(p) --> [p].
+chars('q') --> ['q'].
+chars(r) --> [r].
+chars('s') --> ['s'].
+chars(t) --> [t].
+chars(u) --> [u].
+chars(v) --> [v].
+chars(w) --> [w].
+chars(x) --> [x].
+chars(y) --> [y].
+chars(z) --> [z].
+
+boolean(t_boolean(true)) --> [true].
+boolean(t_boolean(false)) --> [false].
+boolean(t_booleanEquality(X,Y)) --> expression(X), [=], expression(Y).
+boolean(t_booleanNotEquality(X)) --> [not], boolean(X).
+
+relational(>) --> [>].
+relational('>=') --> ['>='].
+relational(<) --> [<].
+relational('<=') --> ['<='].
+relational('==') --> ['=='].
+relational('!=') --> ['!='].
+relational(!) --> [!].
+
+
 program(t_program(X)) --> block(X), ['.'].
 
-block(t_block(X)) --> [begin], ['#'], instructions(X), ['#'], [end].
+block(t_block(X,Y)) --> [begin], declare(X), [;], command(Y), [end].
 
-instructions(t_variable(X,Y)) --> variable_rule(X), ['#'], instructions(Y).
-instructions(t_assignment(X,Y)) --> assignment_rule(X), ['#'], instructions(Y).
-instructions(t_expression(X,Y)) --> expression(X), ['#'], instructions(Y).
-instructions(t_ternary(X,Y)) --> ternary_rule(X), ['#'], instructions(Y).
-instructions(t_conditional(X,Y)) --> conditional_rule(X), ['#'], instructions(Y).
-instructions(t_for_java(X,Y)) --> for_javatype_rule(X), ['#'], instructions(Y).
-instructions(t_for_python(X,Y)) --> for_pythontype_rule(X), ['#'], instructions(Y).
-instructions(t_while(X,Y)) --> while_rule(X), ['#'], instructions(Y).
-instructions(t_print(X,Y)) --> print_rule(X), ['#'], instructions(Y).
+declare(t_declare(X,Y)) --> declare1(X), [;], declare(Y).
+declare(X) --> declare1(X).
+declare1(t_const(X,Y)) --> [int], variable(X), [=], number(Y).
+declare1(t_const(X)) --> [int], variable(X).
+declare1(t_string(X,Y)) --> [string], variable(X), [=], ['"'], chars(Y), ['"'].
+declare1(t_string(X)) --> [string], variable(X).
+declare1(t_bool(X,Y)) --> [bool], variable(X), [=], boolean(Y).
+declare1(t_bool(X)) --> [bool], variable(X).
 
-digits(t_digits(X)) --> digit(X).
-digits(t_digits(X,Y)) --> digit(X), digits(Y).
-digit(t_number_zero(X)) --> zero(X).
-digit(t_number_nonzero(X)) --> non_zero(X).
-zero(0) --> [0].
-non_zero(1) --> [1].
-non_zero(2) --> [2].
-non_zero(3) --> [3].
-non_zero(4) --> [4].
-non_zero(5) --> [5].
-non_zero(6) --> [6].
-non_zero(7) --> [7].
-non_zero(8) --> [8].
-non_zero(9) --> [9].
+command(t_command(X,Y)) --> command1(X), [;], command(Y).
+command(X) --> command1(X).
 
-variable(t_var(X)) --> char(X).
-variable(t_var(X,Y)) --> char(X) variable(Y).
-char(a) --> [a].
-char(b) --> [b].
-char(c) --> [c].
-char(d) --> [d].
-char(A) --> [A].
-char(B) --> [B].
-char(C) --> [C].
-char(D) --> [D].
-escapeChar("/n") --> ["/n"].
+command1(t_assign(X,Y)) --> variable(X), [:=], expression(Y).
 
-boolean(t_bool(X,Y)) --> [boolean], variable(X), [=], boolean(Y).
-boolean(t_bool(X,Y)) --> variable(X), [=], boolean(Y).
-boolean(t_true(true)) --> [true].
-boolean(t_false(false)) --> [false].
+command1(t_relational(X,Y,Z)) --> variable(X), relational(Y), expression(Z).
 
-integer(t_int(X,Y)) --> [int], variable(X), [=], digits(Y).
-integer(t_int(X,Y)) --> variable(X), [=], digits(Y).
+command1(t_conditional(X,Y,Z)) --> [if], boolean(X), [then], command(Y), [else], command(Z), [endif].
+command1(t_conditional(X,Y,Z)) --> [if], command1(X), [then], command(Y), [else], command(Z), [endif].
 
-string(t_string(X)) --> [string], variable(X) ['"'], string(X), ['"'].
-string(t_string(X)) --> variable(X) ['"'], string(X), ['"'].
-string(t_string(X)) --> variable(X).
-string(t_string(X)) --> escapeChar(X).
+command1(t_ternary(X,Y,Z)) --> [tern], boolean(X), [?], command(Y), [:], command(Z), [endtern].
+command1(t_ternary(X,Y,Z)) --> [tern], command1(X), [?], command(Y), [:], command(Z), [endtern].
 
-variable_rule(t_integer(X)) --> integer(X).
-variable_rule(t_string(X)) --> string(X).
-variable_rule(t_boolean(X)) --> boolean(X).
+command1(t_for_javatype(X,Y,Z)) --> [for], command1(X), command1(Y), ['{'], command(Z), ['}'], [endforjava].
+command1(t_for_pythontype(W,X,Y,Z)) --> [for], variable(W), [inrange], number(X), number(Y), ['{'], command(Z), ['}'], [endforpython].
 
+command1(t_while(X,Y)) --> [while], boolean(X), [do], command(Y), [endwhile].
+command1(t_while(X,Y)) --> [while], command1(X), [do], command(Y), [endwhile].
+
+command1(X) --> block(X).
+
+expression(t_add(X,Y)) --> expression(X), [+], temp1(Y).
+expression(t_sub(X,Y)) --> expression(X), [-], temp1(Y).
+expression(X) --> temp1(X).
+temp1(t_multiply(X,Y)) --> temp1(X), [*], temp2(Y).
+temp1(t_divide(X,Y)) --> temp1(X), [/], temp2(Y).
+temp1(X) --> temp2(X).
+temp2(t_parenthesis(X)) --> ['('], expression(X), [')'].
+temp2(t_assign(X,Y)) --> variable(X), [:=], expression(Y).
+temp2(t_variable(X)) --> variable(X).
+temp2(t_number(X)) --> number(X).
