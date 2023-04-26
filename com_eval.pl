@@ -6,16 +6,32 @@ com_eval(X,Env,Env) :- com1_eval(X,Env,_).
 com1_eval(t_assign(X,Y),Env,NewEnv) :- expr_eval(Y,Env,NEnv,Val),
     update(X,NEnv,Val,NewEnv).
 
+%relation evaluation
+com1_eval(t_relational(X,Y,Z),Env,NewEnv,R) :- lookup(X,Env,Val1),expr_eval(Z,Env,NewEnv,Val2),
+    relation_eval(Y,Val1,Val2,R).
+
 %condition evaluation
 com1_eval(t_conditional(X,Y,_Z),Env,NewEnv) :- bool_eval(X,Env,Bool),Bool=true,
     com_eval(Y,Env,NewEnv).
 com1_eval(t_conditional(X,_Y,Z),Env,NewEnv) :- bool_eval(X,Env,Bool),Bool=false,
     com_eval(Z,Env,NewEnv).
-%com1_eval(t_conditional(X,Y,Z), Env, NewEnv) :- com1_eval(X,Env,Env1),
+com1_eval(t_conditional(X,Y,_Z), Env, NewEnv) :- com1_eval(X,Env,Env1,R),R=true,
+    com_eval(Y,Env1,NewEnv).
+com1_eval(t_conditional(X,_Y,Z), Env, NewEnv) :- com1_eval(X,Env,Env1,R),R=false,
+    com_eval(Z,Env1,NewEnv).
+
+# %com1_eval(t_conditional(X,Y,Z), Env, NewEnv) :- com1_eval(X,Env,Env1),
+%ternary evaluation
 com1_eval(t_ternary(X,Y,_Z),Env,NewEnv) :- bool_eval(X,Env,Bool),Bool=true,
     com_eval(Y,Env,NewEnv).
 com1_eval(t_ternary(X,_Y,Z),Env,NewEnv) :- bool_eval(X,Env,Bool),Bool=false,
     com_eval(Z,Env,NewEnv).
+com1_eval(t_ternary(X,Y,_Z),Env,NewEnv) :- com1_eval(X,Env,Env1,R),R=true,
+    com_eval(Y,Env1,NewEnv).
+com1_eval(t_ternary(X,_Y,Z),Env,NewEnv) :- com1_eval(X,Env,Env1,R),R=false,
+    com_eval(Z,Env1,NewEnv).
+
+%for loop evaluation
 com1_eval(t_for_javatype(X,Y,Z),Env,NewEnv) :- com1_eval(X,Env,Env1),com1_eval(Y,Env1,Env2),
     com_eval(Z,Env2,NewEnv).
 
