@@ -1,13 +1,19 @@
+
 program_eval(t_program(P), VAL) :-
     eval_block(P, [], VAL).
 
-eval_block(t_block(T1), ENV, VAL) :-
+eval_block(t_block(T1, T2), ENV, VAL) :- 
     eval_declaration(T1, ENV, NewENV),
-	lookup(Z,NewENV,VAL).
+    com_eval(T2, NewENV, VAL).
+    %write("test"),
+    %lookup(z,NewENV1,VAL).
+
+eval_block(t_block(T1), ENV, VAL) :- 
+    eval_declaration(T1, ENV, NewENV), 
+    lookup(z,NewENV,VAL).
 
 eval_declaration(t_declare(T1, T2),ENV,NewENV) :- 
     eval_declaration(T1, ENV, NewENV1),
-    write("Test"),
     eval_declaration(T2, NewENV1, NewENV).
 
 
@@ -17,7 +23,7 @@ eval_declaration(t_const(T1, T2), ENV, NewENV) :-
     ->  eval_num(T1, ENV, Id),
         notContain(Id, ENV),
         add(Id, _, ENV, NewENV),
-        update(Id, Num, ENV, NewENV)
+        update(Id, ENV, Num, NewENV)
     ;   write("ERROR: t_const second argument is not a numeric literal")
     ).
 
@@ -26,8 +32,8 @@ eval_declaration(t_string(T1, T2), ENV, NewENV) :-
     (   T2 = t_string(Str) % Check if T2 is a string literal
     ->  eval_num(T1, ENV, Id),
         notContain(Id, ENV),
-        add(Id, _, ENV, NewENV1),
-        update(Id, Str, ENV, NewENV)
+        add(Id, _, ENV, _NewENV1),
+        update(Id,ENV, Str, NewENV)
     ;   write("ERROR: t_string second argument is not a string literal")
     ).
 eval_declaration(t_bool(T1, T2), ENV, NewENV) :-
@@ -35,23 +41,25 @@ eval_declaration(t_bool(T1, T2), ENV, NewENV) :-
     (   T2 = t_boolean(Bool) % Check if T2 is a string literal
     ->  eval_num(T1, ENV, Id),
         notContain(Id, ENV),
-        add(Id, _, ENV, NewENV1),
-        update(Id, Bool, ENV, NewENV)
+        add(Id, _, ENV, _NewENV1),
+        update(Id, ENV, Bool, NewENV)
     ;   write("ERROR: t_bool second argument is not a boolean literal")
     ).
 
 eval_declaration(t_const(T),ENV, NewENV) :- 
     eval_num(T,ENV,Id), 
-    write(Id),
     notContain(Id, ENV),
     add(Id,_,ENV, NewENV).
 
-
 eval_declaration(t_string(T),ENV, NewENV) :- 
-    write("test_string"),
     eval_num(T,ENV,Id), 
     notContain(Id, ENV), 
-    add(Id,_,ENV, NewENV).
+    add(t_string(Id),_,ENV, NewENV).
+
+eval_declaration(t_bool(T),ENV, NewENV) :- 
+    eval_num(T,ENV,Id), 
+    notContain(Id, ENV), 
+    add(t_bool(Id),_,ENV, NewENV).
 
 eval_declaration(t_const(_T),ENV, ENV).  
 eval_declaration(t_string(_T),ENV, ENV).
@@ -61,13 +69,96 @@ eval_num(t_var(X),_ENV,X).
 eval_num(t_digit(I),_ENV,I).
 eval_num(t_string(S),_ENV,S).
 
+com_eval(t_command(X,Y),Env,NewEnv) :- com1_eval(X,Env,NEnv), com_eval(Y,NEnv,NewEnv).
+com_eval(X,Env,Env) :- com1_eval(X,Env,_).
+
+%assignment evaluation
+com1_eval(t_assign(t_var(X),Y),Env,NewEnv) :- lookup(X,Env,V),expr_eval(Y,Env,NEnv,Val),write(Val),
+    update(V,NEnv,Val,NewEnv).
+
+%relation evaluation
+com1_eval(t_relational(X,Y,Z),Env,NewEnv,R) :- lookup(X,Env,Val1),expr_eval(Z,Env,NewEnv,Val2),
+    relation_eval(Y,Val1,Val2,R).
+
+%condition evaluation
+com1_eval(t_conditional(X,Y,_Z),Env,NewEnv) :- bool_eval(X,Env,Bool),Bool=true,
+    com_eval(Y,Env,NewEnv).
+com1_eval(t_conditional(X,_Y,Z),Env,NewEnv) :- bool_eval(X,Env,Bool),Bool=false,
+    com_eval(Z,Env,NewEnv).
+com1_eval(t_conditional(X,Y,_Z), Env, NewEnv) :- com1_eval(X,Env,Env1,R),R=true,
+    com_eval(Y,Env1,NewEnv).
+com1_eval(t_conditional(X,_Y,Z), Env, NewEnv) :- com1_eval(X,Env,Env1,R),R=false,
+    com_eval(Z,Env1,NewEnv).
+
+%com1_eval(t_conditional(X,Y,Z), Env, NewEnv) :- com1_eval(X,Env,Env1),
+%ternary evaluation
+com1_eval(t_ternary(X,Y,_Z),Env,NewEnv) :- bool_eval(X,Env,Bool),Bool=true,
+    com_eval(Y,Env,NewEnv).
+com1_eval(t_ternary(X,_Y,Z),Env,NewEnv) :- bool_eval(X,Env,Bool),Bool=false,
+    com_eval(Z,Env,NewEnv).
+com1_eval(t_ternary(X,Y,_Z),Env,NewEnv) :- com1_eval(X,Env,Env1,R),R=true,
+    com_eval(Y,Env1,NewEnv).
+com1_eval(t_ternary(X,_Y,Z),Env,NewEnv) :- com1_eval(X,Env,Env1,R),R=false,
+    com_eval(Z,Env1,NewEnv).
+
+%for loop evaluation
+com1_eval(t_for_javatype(X,Y,Z),Env,NewEnv) :- com1_eval(X,Env,Env1),com1_eval(Y,Env1,Env2),
+    com_eval(Z,Env2,NewEnv).
+
+%evaluate the boolean
+bool_eval(true,_Env,true).
+bool_eval(false,_Env,false).
+bool_eval(t_booleanEquality(X,Y),Env,true) :- expr_eval(X,Env,Env1,Val1),
+    expr_eval(Y,Env,Env1,Val2),
+    Val1=Val2.
+bool_eval(t_booleanEquality(X,Y),Env,false) :- expr_eval(X,Env,Env1,Val1),
+    expr_eval(Y,Env,Env1,Val2),
+    Val1\=Val2.
+bool_eval(t_booleanNotEquality(X),Env,true):- bool_eval(X,Env,Bool), Bool = false.
+bool_eval(t_booleanNotEquality(X),Env,false):- bool_eval(X,Env,Bool), Bool = true.
+
+%new evaluate
+expr_eval(t_digit(X),ENV,ENV,X).
+expr_eval(t_string(X),ENV,ENV,X).
+expr_eval(t_bool(X),ENV,ENV,X).
+
+%evaluate the expression
+expr_eval(X, Env, Env, Val) :- temp1_eval(X, Env, Env, Val).
+expr_eval(t_add(X,Y), Env, NewEnv, Val) :- expr_eval(X, Env, NEnv,V1),
+    temp1_eval(Y, NEnv, NewEnv,V2), Val is V1 + V2.
+expr_eval(t_sub(X,Y), Env, NewEnv, Val) :- expr_eval(X, Env, NEnv,V1), 
+    temp1_eval(Y, NEnv, NewEnv,V2), Val is V1 - V2.
+
+%evaluate temp1 expression
+temp1_eval(T,Env,Env,Val) :- temp2_eval(T,Env,Env,Val).
+temp1_eval(t_multiply(X,Y), Env, NewEnv, Val) :- temp1_eval(X, Env, NEnv,Val1),
+    temp2_eval(Y,NEnv,NewEnv,Val2),Val is Val1 * Val2.
+temp1_eval(t_divide(X,Y), Env, NewEnv, Val) :- temp1_eval(X, Env, NEnv,Val1),
+    temp2_eval(Y,NEnv,NewEnv,Val2),Val is Val1 / Val2.
+
+%evaluate temp2 expression
+temp2_eval(t_parenthesis(X),Env,NewEnv,Val) :- expr_eval(X,Env,NewEnv,Val).
+temp2_eval(t_assign(X,Y),Env,NewEnv,Val) :- expr_eval(Y,Env,NEnv,Val),
+    update(X,NEnv,Val,NewEnv).
+
+%evaluate relational
+relation_eval('>', X, Y, R) :- X > Y, R = true.
+relation_eval('>=', X, Y, R) :- X >= Y, R = true.
+relation_eval('<', X, Y, R) :- X < Y, R = true.
+relation_eval('<=', X, Y, R) :- X =< Y, R = true.
+relation_eval('==', X, Y, R) :- X == Y, R = true.
+relation_eval('!=', X, Y, R) :- X \= Y, R = true.
+relation_eval(!, _, _, R) :- R = false.
+
+add(Id, NewVal,L,[(Id, NewVal)|L]).
+
 lookup(Id,[(Id,Val)|_], Val).
-lookup(Id,[_|T], Val):-lookup(Id,T, Val).
+lookup(Id,[_|T], Val):-lookup(Id, T, Val),write(" lookup ").
 lookup(Id,[],_Val):-write(Id),write(" not exist.").
 
-update(Id, Val, [], [(Id, Val)]).
-update(Id, Val, [(Id,_)|T], [(Id, Val)|T]).
-update(Id, Val, [H|T], [H|R]) :- H\=(Id,_),update(Id,Val,T,R), write("update3").
+update(V,[],NewVal,[(V,NewVal)]).
+update(V,[(V,_)|T],NewVal,[(V,NewVal)|T]).
+update(V,[H|T],NewVal,[H|NewEnv]):-update(V,T,NewVal,NewEnv).
 
 notContain(_Id, []).
 notContain(Id, [(Id,_)|_]) :-
@@ -76,4 +167,3 @@ notContain(Id, [(Id1,_)|T]) :-
     Id \= Id1,
     notContain(Id, T).
 
-add(Id, NewVal,L,[(Id, NewVal)|L]).
