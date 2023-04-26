@@ -3,8 +3,8 @@ com_eval(t_command(X,Y),Env,NewEnv) :- com1_eval(X,Env,NEnv), com_eval(Y,NEnv,Ne
 com_eval(X,Env,Env) :- com1_eval(X,Env,_).
 
 %assignment evaluation
-com1_eval(t_assign(X,Y),Env,NewEnv) :- expr_eval(Y,Env,NEnv,Val),
-    update(X,NEnv,Val,NewEnv).
+com1_eval(t_assign(X,Y),Env,NewEnv) :- lookup(X,Env,V),expr_eval(Y,Env,NEnv,Val),
+    update(V,NEnv,Val,NewEnv).
 
 %relation evaluation
 com1_eval(t_relational(X,Y,Z),Env,NewEnv,R) :- lookup(X,Env,Val1),expr_eval(Z,Env,NewEnv,Val2),
