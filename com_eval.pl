@@ -58,3 +58,12 @@ update(V,[H|T],NewVal,[H|NewEnv]):-update(V,T,NewVal,NewEnv).
 %look up value of V from environment
 lookup(V,[(V,Val)|_],Val).
 lookup(V,[_|T],Val):-lookup(V,T,Val).
+
+%evaluate relational
+relation_eval('>', X, Y, R) :- X > Y, R = true.
+relation_eval('>=', X, Y, R) :- X >= Y, R = true.
+relation_eval('<', X, Y, R) :- X < Y, R = true.
+relation_eval('<=', X, Y, R) :- X =< Y, R = true.
+relation_eval('==', X, Y, R) :- X == Y, R = true.
+relation_eval('!=', X, Y, R) :- X \= Y, R = true.
+relation_eval(!, _, _, R) :- R = false.
