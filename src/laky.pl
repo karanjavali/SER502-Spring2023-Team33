@@ -7,7 +7,7 @@ relational(>) --> [>].
 relational(>=) --> [>=].
 relational(<) --> [<].
 relational(<=) --> [<=].
-relational(:=) --> [:=].
+relational(==) --> [==].
 relational('!=') --> ['!='].
 relational(!) --> [!].
 relational(&&) --> [&&].
