@@ -1,6 +1,6 @@
 :- use_rendering(svgtree).
 
-:- table expression/3, temp1/3, declare/3.
+:- table expression/3, temp1/3, declare/3, expr_eval/3.
 
 program(t_program(X)) --> block(X), ['.'].
 
@@ -12,12 +12,12 @@ declare(t_declare(X,Y)) --> declare1(X), [;], declare(Y).
 declare(X) --> declare1(X).
 
 declare1(t_const(X)) --> [int], variable(X).
-declare1(t_const(X,Y)) --> [int], variable(X), [=], digit(Y).
+declare1(t_const(X,Y)) --> [int], variable(X), [:=], digit(Y).
 
-declare1(t_string(X,Y)) --> [string], variable(X), [=], ['"'], string(Y), ['"'].
+declare1(t_string(X,Y)) --> [string], variable(X), [:=], ['"'], string(Y), ['"'].
 declare1(t_string(X)) --> [string], variable(X).
 
-declare1(t_bool(X,Y)) --> [bool], variable(X), [=], boolean(Y).
+declare1(t_bool(X,Y)) --> [bool], variable(X), [:=], boolean(Y).
 declare1(t_bool(X)) --> [bool], variable(X).
 
 
@@ -55,12 +55,6 @@ relational('==') --> ['=='].
 relational('!=') --> ['!='].
 relational(!) --> [!].
 
-variable(t_var(X)) --> [X], { atom(X) }.
-
-digit(t_digit(I)) --> [I], { number(I) }.
-
-string(t_string(S)) --> [S], { atom(S) }.
-
 expression(t_add(X,Y)) --> expression(X), [+], temp1(Y).
 expression(t_sub(X,Y)) --> expression(X), [-], temp1(Y).
 expression(X) --> temp1(X).
@@ -69,6 +63,12 @@ temp1(t_divide(X,Y)) --> temp1(X), [/], temp2(Y).
 temp1(X) --> temp2(X).
 temp2(t_parenthesis(X)) --> ['('], expression(X), [')'].
 temp2(t_assign(X,Y)) --> variable(X), [:=], expression(Y).
-temp2(t_variable(X)) --> [X], { atom(X) }.
+temp2(t_var(X)) --> [X], { atom(X) }.
 temp2(t_digit(X)) --> [X], { number(X) }.
-temp2(t_string(X)) --> [X], { atom(X) }.
+%temp2(t_string(X)) --> [X], { atom(X) }.
+
+variable(t_var(X)) --> [X], { atom(X) }.
+
+digit(t_digit(I)) --> [I], { number(I) }.
+
+string(t_string(S)) --> [S], { atom(S) }.

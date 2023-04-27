@@ -206,3 +206,5 @@ notContain(Id, [(Id1,_)|T]) :-
     Id \= Id1,
     notContain(Id, T).
 
+
+
