@@ -2,21 +2,21 @@
 
 :- table expression/3, temp1/3, declare/3, expr_eval/3.
 
-boolean(t_boolean(true)) --> [true].
-boolean(t_boolean(false)) --> [false].
-boolean(t_booleanEquality(X,Y)) --> expression(X), [:=], expression(Y).
-boolean(t_booleanNotEquality(X)) --> [not], boolean(X).
 
 relational(>) --> [>].
 relational(>=) --> [>=].
 relational(<) --> [<].
 relational(<=) --> [<=].
-relational(==) --> [==].
+relational(:=) --> [:=].
 relational('!=') --> ['!='].
 relational(!) --> [!].
 relational(&&) --> [&&].
 relational('||') --> ['||'].
 
+boolean(t_boolean(true)) --> [true].
+boolean(t_boolean(false)) --> [false].
+boolean(t_booleanEquality(X,Y,Z)) --> expression(X), relational(Y), expression(Z).
+boolean(t_booleanNotEquality(X)) --> [not], boolean(X).
 
 program(t_program(X)) --> block(X), ['.'].
 
@@ -42,19 +42,14 @@ command(X) --> command1(X).
 
 command1(t_assign(X,Y)) --> variable(X), [:=], expression(Y).
 
-command1(t_relational(X,Y,Z)) --> expression(X), relational(Y), expression(Z).
-
 command1(t_conditional(X,Y,Z)) --> [if], boolean(X), [then], command(Y), [else], command(Z), [endif].
-command1(t_conditional(X,Y,Z)) --> [if], command1(X), [then], command(Y), [else], command(Z), [endif].
 
 command1(t_ternary(X,Y,Z)) --> [tern], boolean(X), [?], command(Y), [:], command(Z), [endtern].
-command1(t_ternary(X,Y,Z)) --> [tern], command1(X), [?], command(Y), [:], command(Z), [endtern].
 
-command1(t_for_javatype(X,Y,Z)) --> [for], command1(X), command1(Y), ['{'], command(Z), ['}'], [endforjava].
+command1(t_for_javatype(X,Y,Z)) --> [for], command1(X), boolean(Y), ['{'], command(Z), ['}'], [endforjava].
 command1(t_for_pythontype(W,X,Y,Z)) --> [for], variable(W), [inrange], digit(X), digit(Y), ['{'], command(Z), ['}'], [endforpython].
 
 command1(t_while(X,Y)) --> [while], boolean(X), [do], command(Y), [endwhile].
-command1(t_while(X,Y)) --> [while], command1(X), [do], command(Y), [endwhile].
 
 command1(t_print(X)) --> [print], expression(X).
 
