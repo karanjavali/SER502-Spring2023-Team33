@@ -11,16 +11,18 @@ string(t_string(X)) --> [X], { atom(X) }.
 
 boolean(t_boolean(true)) --> [true].
 boolean(t_boolean(false)) --> [false].
-boolean(t_booleanEquality(X,Y)) --> expression(X), [=], expression(Y).
+boolean(t_booleanEquality(X,Y)) --> expression(X), [:=], expression(Y).
 boolean(t_booleanNotEquality(X)) --> [not], boolean(X).
 
 relational(>) --> [>].
-relational('>=') --> ['>='].
+relational(>=) --> [>=].
 relational(<) --> [<].
-relational('<=') --> ['<='].
-relational('==') --> ['=='].
+relational(<=) --> [<=].
+relational(==) --> [==].
 relational('!=') --> ['!='].
 relational(!) --> [!].
+relational(&&) --> [&&].
+relational('||') --> ['||'].
 
 
 program(t_program(X)) --> block(X), ['.'].
@@ -32,13 +34,13 @@ block(t_block(X,Y)) --> [begin], declare(X), [;], command(Y), [end].
 declare(t_declare(X,Y)) --> declare1(X), [;], declare(Y).
 declare(X) --> declare1(X).
 
-declare1(t_const(X,Y)) --> [int], variable(X), [=], digit(Y).
+declare1(t_const(X,Y)) --> [int], variable(X), [:=], digit(Y).
 declare1(t_const(X)) --> [int], variable(X).
 
-declare1(t_string(X,Y)) --> [string], variable(X), [=], ['"'], string(Y), ['"'].
+declare1(t_string(X,Y)) --> [string], variable(X), [:=], ['"'], string(Y), ['"'].
 declare1(t_string(X)) --> [string], variable(X).
 
-declare1(t_bool(X,Y)) --> [bool], variable(X), [=], boolean(Y).
+declare1(t_bool(X,Y)) --> [bool], variable(X), [:=], boolean(Y).
 declare1(t_bool(X)) --> [bool], variable(X).
 
 
@@ -47,7 +49,7 @@ command(X) --> command1(X).
 
 command1(t_assign(X,Y)) --> variable(X), [:=], expression(Y).
 
-command1(t_relational(X,Y,Z)) --> variable(X), relational(Y), expression(Z).
+command1(t_relational(X,Y,Z)) --> expression(X), relational(Y), expression(Z).
 
 command1(t_conditional(X,Y,Z)) --> [if], boolean(X), [then], command(Y), [else], command(Z), [endif].
 command1(t_conditional(X,Y,Z)) --> [if], command1(X), [then], command(Y), [else], command(Z), [endif].
