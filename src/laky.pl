@@ -63,6 +63,8 @@ command1(t_for_pythontype(W,X,Y,Z)) --> [for], variable(W), [inrange], digit(X),
 command1(t_while(X,Y)) --> [while], boolean(X), [do], command(Y), [endwhile].
 command1(t_while(X,Y)) --> [while], command1(X), [do], command(Y), [endwhile].
 
+command1(t_print(X)) --> [print], expression(X).
+
 command1(X) --> block(X).
 
 
