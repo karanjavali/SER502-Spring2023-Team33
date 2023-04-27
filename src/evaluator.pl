@@ -1,3 +1,4 @@
+
 program_eval(t_program(P), VAL) :-
     eval_block(P, [], VAL).
 
@@ -185,6 +186,14 @@ relation_eval('<=', X, Y, R) :- X =< Y, R = true.
 relation_eval('==', X, Y, R) :- X == Y, R = true.
 relation_eval('!=', X, Y, R) :- X \= Y, R = true.
 relation_eval(!, _, _, R) :- R = false.
+relation_eval(&&,X,Y,R) :- X = true, Y = false, R = false.
+relation_eval(&&,X,Y,R) :- X = false, Y = false, R = false.
+relation_eval(&&,X,Y,R) :- X = false, Y = true, R = false.
+relation_eval(&&,X,Y,R) :- X = true, Y = true, R = true.
+relation_eval('||',X,Y,R) :- X = true, Y = false, R = true.
+relation_eval('||',X,Y,R) :- X = false, Y = false, R = false.
+relation_eval('||',X,Y,R) :- X = false, Y = true, R = true.
+relation_eval('||',X,Y,R) :- X = true, Y = true, R = true.
 
 add(Id, NewVal,L,[(Id, NewVal)|L]).
 
@@ -205,6 +214,3 @@ notContain(Id, [(Id,_)|_]) :-
 notContain(Id, [(Id1,_)|T]) :-
     Id \= Id1,
     notContain(Id, T).
-
-
-
