@@ -1,4 +1,3 @@
-
 program_eval(t_program(P), VAL) :-
     eval_block(P, [], VAL).
 
@@ -18,18 +17,17 @@ eval_declaration(t_declare(T1, T2),ENV,NewENV) :-
 
 
 eval_declaration(t_const(T1, T2), ENV, Env) :-
-    write("assign int "),
+    %write("assign int "),
     (   T2 = t_digit(Num) % Check if T2 is a numeric literal
     ->  eval_num(T1, ENV, Id),
         notContain(Id, ENV),
         add(Id, _, ENV, NewENV),
-        update(Id, NewENV, Num, Env),
-        write('Num: '), write(Num), nl
+        update(Id, NewENV, Num, Env)
     ;   write("ERROR: t_const second argument is not a numeric literal")
     ).
 
 eval_declaration(t_string(T1, T2), ENV, Env) :-
-    write("assign string "),
+    %write("assign string "),
     (   T2 = t_string(Str) % Check if T2 is a string literal
     ->  eval_num(T1, ENV, Id),
         notContain(Id, ENV),
@@ -72,53 +70,75 @@ eval_num(t_string(X),_ENV,X).
 eval_num(t_bool(X),_ENV,X).
 
 com_eval(t_command(X,Y),Env,NewEnv) :- 
-     write('t_command Env: '), write(Env), nl,
+     %write('t_command Env: '), write(Env), nl,
     com1_eval(X,Env,NEnv),
-     write('t_command NEnv: '), write(NEnv), nl,
+     %write('t_command NEnv: '), write(NEnv), nl,
     com_eval(Y,NEnv,NewEnv).
-com_eval(X,Env,NewEnv) :- write('com_eval '), nl,
+com_eval(X,Env,NewEnv) :- 
+    write('com_eval '),write(X), nl,
     com1_eval(X,Env,NewEnv).
 
+%condition evaluation
+com1_eval(t_conditional(X,Y,Z),Env,NewEnv) :-
+    bool_eval(X,Env,Bool),
+    ( Bool=true ->
+        com_eval(Y,Env,NewEnv)
+    ; Bool=false ->
+        com_eval(Z,Env,NewEnv)
+    ).
+
+com1_eval(t_conditional(X,Y,Z), Env, NewEnv) :- 
+    com1_eval(X,Env,Env1,R),
+  	( R=true ->
+        com_eval(Y,Env1,NewEnv)
+    ; R=false ->
+        com_eval(Z,Env1,NewEnv)
+    ).
 %assignment evaluation
 com1_eval(t_assign(X,Y),Env,NewEnv) :-
     %write("test assign"), nl,
     eval_num(X, Env, Id), nl,
-    write('X: '), write(X), nl,
-    write('Id: '), write(Id), nl,
-    write('Env: '), write(Env), nl,
     %lookup(Id, Env, _),
-    write('Y: '), write(Y), nl,
     expr_eval(Y,Env,NEnv,Val),
-    write('Val: '), write(Val), nl,
-    write('NEnv: '), write(NEnv), nl,
-    update(Id,NEnv,Val,NewEnv),
-    write('NewEnv: '), write(NewEnv), nl.
+    update(Id,NEnv,Val,NewEnv).
 
 %relation evaluation
-com1_eval(t_relational(X,Y,Z),Env,NewEnv,R) :- lookup(X,Env,Val1),expr_eval(Z,Env,NewEnv,Val2),
-    relation_eval(Y,Val1,Val2,R).
+com1_eval(t_booleanEquality(X,Y,Z),Env,NewEnv,R) :- 
+    write('Compare: '),nl,
+    write('X: '), write(X), nl,
+    write('Y: '), write(Y), nl,
+    write('Z: '), write(Z), nl,
+    eval_num(X, Env, Id),
+    lookup(Id,Env,Val1),nl,
+    write('X: '), write(Val1), nl,
+    expr_eval(Z,Env,NewEnv,Val2), nl, nl,
+    write('Z: '), write(Val2), nl,
+    write('Y: '), write(Y), nl,
+    relation_eval(Y,Val1,Val2,R),
+    write(R).
 
-%condition evaluation
-com1_eval(t_conditional(X,Y,_Z),Env,NewEnv) :- bool_eval(X,Env,Bool),Bool=true,
-    com_eval(Y,Env,NewEnv).
-com1_eval(t_conditional(X,_Y,Z),Env,NewEnv) :- bool_eval(X,Env,Bool),Bool=false,
-    com_eval(Z,Env,NewEnv).
-com1_eval(t_conditional(X,Y,_Z), Env, NewEnv) :- com1_eval(X,Env,Env1,R),R=true,
-    com_eval(Y,Env1,NewEnv).
-com1_eval(t_conditional(X,_Y,Z), Env, NewEnv) :- com1_eval(X,Env,Env1,R),R=false,
-    com_eval(Z,Env1,NewEnv).
 
 %com1_eval(t_conditional(X,Y,Z), Env, NewEnv) :- com1_eval(X,Env,Env1),
 %ternary evaluation
-com1_eval(t_ternary(X,Y,_Z),Env,NewEnv) :- bool_eval(X,Env,Bool),Bool=true,
-    com_eval(Y,Env,NewEnv).
-com1_eval(t_ternary(X,_Y,Z),Env,NewEnv) :- bool_eval(X,Env,Bool),Bool=false,
-    com_eval(Z,Env,NewEnv).
-com1_eval(t_ternary(X,Y,_Z),Env,NewEnv) :- com1_eval(X,Env,Env1,R),R=true,
-    com_eval(Y,Env1,NewEnv).
-com1_eval(t_ternary(X,_Y,Z),Env,NewEnv) :- com1_eval(X,Env,Env1,R),R=false,
-    com_eval(Z,Env1,NewEnv).
-
+com1_eval(t_ternary(X,Y,Z),Env,NewEnv) :- 
+    bool_eval(X,Env,Bool),
+    ( Bool=true ->
+        com_eval(Y,Env,NewEnv)
+    ; Bool=false ->
+        com_eval(Z,Env,NewEnv)
+    ).
+com1_eval(t_ternary(X,Y,Z),Env,NewEnv) :- 
+    com1_eval(X,Env,Env1,R),
+    ( R=true ->
+        com_eval(Y,Env1,NewEnv)
+    ; R=false ->
+        com_eval(Z,Env1,NewEnv)
+    ).
+%com1_eval(t_ternary(X,Y,_Z),Env,NewEnv) :- com1_eval(X,Env,Env1,R),R=true,
+    %com_eval(Y,Env1,NewEnv).
+%com1_eval(t_ternary(X,_Y,Z),Env,NewEnv) :- com1_eval(X,Env,Env1,R),R=false,
+    %com_eval(Z,Env1,NewEnv).
+              
 %for loop evaluation
 com1_eval(t_for_javatype(X,Y,Z),Env,NewEnv) :- com1_eval(X,Env,Env1),com1_eval(Y,Env1,Env2),
     com_eval(Z,Env2,NewEnv).
@@ -126,12 +146,19 @@ com1_eval(t_for_javatype(X,Y,Z),Env,NewEnv) :- com1_eval(X,Env,Env1),com1_eval(Y
 %evaluate the boolean
 bool_eval(true,_Env,true).
 bool_eval(false,_Env,false).
-bool_eval(t_booleanEquality(X,Y),Env,true) :- expr_eval(X,Env,Env1,Val1),
-    expr_eval(Y,Env,Env1,Val2),
-    Val1=Val2.
-bool_eval(t_booleanEquality(X,Y),Env,false) :- expr_eval(X,Env,Env1,Val1),
-    expr_eval(Y,Env,Env1,Val2),
-    Val1\=Val2.
+bool_eval(t_booleanEquality(X,Y,Z),Env,R) :- 
+    write('Compare:1 '),nl,
+    write('X: '), write(X), nl,
+    write('Y: '), write(Y), nl,
+    write('Z: '), write(Z), nl,
+    eval_num(X, Env, Id),
+    lookup(Id,Env,Val1),nl,
+    write('X: '), write(Val1), nl,
+    expr_eval(Z,Env,Env,Val2), nl, nl,
+    write('Z: '), write(Val2), nl,
+    write('Y: '), write(Y), nl,
+    relation_eval(Y,Val1,Val2,R),
+    write(R).
 bool_eval(t_booleanNotEquality(X),Env,true):- bool_eval(X,Env,Bool), Bool = false.
 bool_eval(t_booleanNotEquality(X),Env,false):- bool_eval(X,Env,Bool), Bool = true.
 
@@ -151,7 +178,7 @@ expr_eval(X, Env, Env, Val) :-
     %write(Val).
 expr_eval(X, Env, Env, Val) :- temp1_eval(X, Env, Env, Val).
 expr_eval(t_add(X,Y), Env, NewEnv, Val) :-
-    write("add "), write(X), write(Y), nl,
+    %write("add "), write(X), write(Y), nl,
     expr_eval(X, Env, NEnv,V1),
     temp1_eval(Y, NEnv, NewEnv,V2), 
     Val is V1 + V2.
@@ -159,7 +186,8 @@ expr_eval(t_sub(X,Y), Env, NewEnv, Val) :- expr_eval(X, Env, NEnv,V1),
     temp1_eval(Y, NEnv, NewEnv,V2), Val is V1 - V2.
 
 %evaluate temp1 expression
-temp1_eval(t_digit(X),Env,Env,X):-write("digit "), write(X), nl.
+temp1_eval(t_digit(X),Env,Env,X).
+temp1_eval(t_var(X),Env,Env,Val):- lookup(X, Env, Val).
 temp1_eval(T,Env,Env,Val) :- temp2_eval(T,Env,Env,Val).
 temp1_eval(T,Env,Env,Val) :-
     eval_num(T, Env, Id),
@@ -170,7 +198,8 @@ temp1_eval(t_divide(X,Y), Env, NewEnv, Val) :- temp1_eval(X, Env, NEnv,Val1),
     temp2_eval(Y,NEnv,NewEnv,Val2),Val is Val1 / Val2.
 
 %evaluate temp2 expression
-temp2_eval(t_digit(X),Env,Env,X):- write("digit "), write(X), nl.
+temp2_eval(t_digit(X),Env,Env,X).
+temp2_eval(t_var(X),Env,Env,X).
 temp2_eval(t_parenthesis(X),Env,NewEnv,Val) :- expr_eval(X,Env,NewEnv,Val).
 temp2_eval(t_assign(X,Y),Env,NewEnv,Val) :- expr_eval(Y,Env,NEnv,Val),
     update(X,NEnv,Val,NewEnv).
@@ -183,7 +212,7 @@ relation_eval('>', X, Y, R) :- X > Y, R = true.
 relation_eval('>=', X, Y, R) :- X >= Y, R = true.
 relation_eval('<', X, Y, R) :- X < Y, R = true.
 relation_eval('<=', X, Y, R) :- X =< Y, R = true.
-relation_eval('==', X, Y, R) :- X == Y, R = true.
+relation_eval('==', X, Y, R) :- equalCheck(X, Y, R).
 relation_eval('!=', X, Y, R) :- X \= Y, R = true.
 relation_eval(!, _, _, R) :- R = false.
 relation_eval(&&,X,Y,R) :- X = true, Y = false, R = false.
@@ -195,8 +224,10 @@ relation_eval('||',X,Y,R) :- X = false, Y = false, R = false.
 relation_eval('||',X,Y,R) :- X = false, Y = true, R = true.
 relation_eval('||',X,Y,R) :- X = true, Y = true, R = true.
 
-add(Id, NewVal,L,[(Id, NewVal)|L]).
+equalCheck(X, Y, true):- X == Y.
+equalCheck(X, Y, false):- dif(X, Y).
 
+add(Id, NewVal,L,[(Id, NewVal)|L]).
 lookup(Id,[(Id,Val)|_], Val):- write("lookup").
 lookup(Id,[H|T], Val):-
     write("Pair: "),write(H), nl,
