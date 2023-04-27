@@ -1,13 +1,6 @@
 :- use_rendering(svgtree).
 
-:- table expression/3, temp1/3.
-
-
-variable(t_var(X)) --> [X], { atom(X) }.
-
-digit(t_digit(X)) --> [X], { number(X) }.
-
-string(t_string(X)) --> [X], { atom(X) }.
+:- table expression/3, temp1/3, declare/3, expr_eval/3.
 
 boolean(t_boolean(true)) --> [true].
 boolean(t_boolean(false)) --> [false].
@@ -34,8 +27,8 @@ block(t_block(X,Y)) --> [begin], declare(X), [;], command(Y), [end].
 declare(t_declare(X,Y)) --> declare1(X), [;], declare(Y).
 declare(X) --> declare1(X).
 
-declare1(t_const(X,Y)) --> [int], variable(X), [:=], digit(Y).
 declare1(t_const(X)) --> [int], variable(X).
+declare1(t_const(X,Y)) --> [int], variable(X), [:=], digit(Y).
 
 declare1(t_string(X,Y)) --> [string], variable(X), [:=], ['"'], string(Y), ['"'].
 declare1(t_string(X)) --> [string], variable(X).
@@ -76,5 +69,13 @@ temp1(t_divide(X,Y)) --> temp1(X), [/], temp2(Y).
 temp1(X) --> temp2(X).
 temp2(t_parenthesis(X)) --> ['('], expression(X), [')'].
 temp2(t_assign(X,Y)) --> variable(X), [:=], expression(Y).
-temp2(t_variable(X)) --> variable(X).
-temp2(t_digit(X)) --> digit(X).
+temp2(t_var(X)) --> [X], { atom(X) }.
+temp2(t_digit(X)) --> [X], { number(X) }.
+%temp2(t_string(X)) --> [X], { atom(X) }.
+
+variable(t_var(X)) --> [X], { atom(X) }.
+
+digit(t_digit(I)) --> [I], { number(I) }.
+
+string(t_string(S)) --> [S], { atom(S) }.
+
