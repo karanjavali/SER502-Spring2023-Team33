@@ -1,4 +1,3 @@
-
 program_eval(t_program(P), VAL) :-
     eval_block(P, [], VAL).
 
@@ -9,72 +8,82 @@ eval_block(t_block(T1, T2), ENV, VAL) :-
     %lookup(z,NewENV1,VAL).
 
 eval_block(t_block(T1), ENV, VAL) :- 
-    eval_declaration(T1, ENV, NewENV), 
-    lookup(z,NewENV,VAL).
+    eval_declaration(T1, ENV, VAL). 
+    %lookup(z,NewENV,VAL).
 
 eval_declaration(t_declare(T1, T2),ENV,NewENV) :- 
     eval_declaration(T1, ENV, NewENV1),
     eval_declaration(T2, NewENV1, NewENV).
 
 
-eval_declaration(t_const(T1, T2), ENV, NewENV) :-
+eval_declaration(t_const(T1, T2), ENV, Env) :-
     write("assign int "),
     (   T2 = t_digit(Num) % Check if T2 is a numeric literal
     ->  eval_num(T1, ENV, Id),
         notContain(Id, ENV),
         add(Id, _, ENV, NewENV),
-        update(Id, ENV, Num, NewENV)
+        update(Id, NewENV, Num, Env),
+        write('Num: '), write(Num), nl
     ;   write("ERROR: t_const second argument is not a numeric literal")
     ).
 
-eval_declaration(t_string(T1, T2), ENV, NewENV) :-
+eval_declaration(t_string(T1, T2), ENV, Env) :-
     write("assign string "),
     (   T2 = t_string(Str) % Check if T2 is a string literal
     ->  eval_num(T1, ENV, Id),
         notContain(Id, ENV),
-        add(Id, _, ENV, _NewENV1),
-        update(Id,ENV, Str, NewENV)
+        add(Id, _, ENV, NewENV),
+        update(Id,NewENV, Str, Env)
     ;   write("ERROR: t_string second argument is not a string literal")
     ).
-eval_declaration(t_bool(T1, T2), ENV, NewENV) :-
+eval_declaration(t_bool(T1, T2), ENV, Env) :-
     write("assign boolean "),
     (   T2 = t_boolean(Bool) % Check if T2 is a string literal
     ->  eval_num(T1, ENV, Id),
         notContain(Id, ENV),
-        add(Id, _, ENV, _NewENV1),
-        update(Id, ENV, Bool, NewENV)
+        add(Id, _, ENV, NewENV),
+        update(Id, NewENV, Bool, Env)
     ;   write("ERROR: t_bool second argument is not a boolean literal")
     ).
 
 eval_declaration(t_const(T),ENV, NewENV) :- 
     eval_num(T,ENV,Id), 
     notContain(Id, ENV),
-    add(Id,_,ENV, NewENV).
+    add(Id,_,ENV, NewENV),
+    write(NewENV), nl.
 
 eval_declaration(t_string(T),ENV, NewENV) :- 
     eval_num(T,ENV,Id), 
     notContain(Id, ENV), 
-    add(t_string(Id),_,ENV, NewENV).
+    add(Id,_,ENV, NewENV).
 
 eval_declaration(t_bool(T),ENV, NewENV) :- 
     eval_num(T,ENV,Id), 
     notContain(Id, ENV), 
-    add(t_bool(Id),_,ENV, NewENV).
+    add(Id,_,ENV, NewENV).
 
 eval_declaration(t_const(_T),ENV, ENV).  
 eval_declaration(t_string(_T),ENV, ENV).
 eval_declaration(t_bool(_T),ENV, ENV).
 
 eval_num(t_var(X),_ENV,X).
-eval_num(t_digit(I),_ENV,I).
-eval_num(t_string(S),_ENV,S).
+eval_num(t_digit(X),_ENV,X).
+eval_num(t_string(X),_ENV,X).
 
 com_eval(t_command(X,Y),Env,NewEnv) :- com1_eval(X,Env,NEnv), com_eval(Y,NEnv,NewEnv).
-com_eval(X,Env,Env) :- com1_eval(X,Env,_).
+com_eval(X,Env,NewEnv) :- com1_eval(X,Env,NewEnv).
 
 %assignment evaluation
-com1_eval(t_assign(t_var(X),Y),Env,NewEnv) :- lookup(X,Env,V),expr_eval(Y,Env,NEnv,Val),write(Val),
-    update(V,NEnv,Val,NewEnv).
+com1_eval(t_assign(X,Y),Env,NewEnv) :- 
+    eval_num(X, Env, Id), nl,
+    write('X: '), write(X), nl,
+    write('Id: '), write(Id), nl,
+    lookup(Id, Env, _),
+    expr_eval(Y,Env,NEnv,Val),
+    write('Val: '), write(Val), nl,
+    write('NEnv: '), write(NEnv), nl,
+    update(Id,NEnv,Val,NewEnv),
+    write('NewEnv: '), write(NewEnv), nl.
 
 %relation evaluation
 com1_eval(t_relational(X,Y,Z),Env,NewEnv,R) :- lookup(X,Env,Val1),expr_eval(Z,Env,NewEnv,Val2),
@@ -152,13 +161,13 @@ relation_eval(!, _, _, R) :- R = false.
 
 add(Id, NewVal,L,[(Id, NewVal)|L]).
 
-lookup(Id,[(Id,Val)|_], Val).
+lookup(Id,[(Id,_Val)|_], Id).
 lookup(Id,[_|T], Val):-lookup(Id, T, Val),write(" lookup ").
 lookup(Id,[],_Val):-write(Id),write(" not exist.").
 
-update(V,[],NewVal,[(V,NewVal)]).
-update(V,[(V,_)|T],NewVal,[(V,NewVal)|T]).
-update(V,[H|T],NewVal,[H|NewEnv]):-update(V,T,NewVal,NewEnv).
+update(V,[],NewVal,[(V,NewVal)]):- write("cant not find").
+update(V,[(V,_)|T],NewVal,[(V,NewVal)|T]):- write(NewVal).
+update(V,[H|T],NewVal,[H|NewEnv]):-H\=(V,_),update(V,T,NewVal,NewEnv).
 
 notContain(_Id, []).
 notContain(Id, [(Id,_)|_]) :-
@@ -166,4 +175,3 @@ notContain(Id, [(Id,_)|_]) :-
 notContain(Id, [(Id1,_)|T]) :-
     Id \= Id1,
     notContain(Id, T).
-
