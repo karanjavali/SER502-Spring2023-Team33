@@ -123,10 +123,6 @@ com1_eval(t_booleanEquality(X,Y,Z),Env,NewEnv,R) :-
 
 %com1_eval(t_conditional(X,Y,Z), Env, NewEnv) :- com1_eval(X,Env,Env1),
 %ternary evaluation
-<<<<<<< HEAD
-=======
-
->>>>>>> 4e09c95dcc14554dd999f696f934885b03701dba
 com1_eval(t_ternary(X,Y,Z),Env,NewEnv) :- 
     bool_eval(X,Env,Bool),
     ( Bool=true ->
@@ -141,14 +137,6 @@ com1_eval(t_ternary(X,Y,Z),Env,NewEnv) :-
     ; R=false ->
         com_eval(Z,Env1,NewEnv)
     ).
-<<<<<<< HEAD
-=======
-%com1_eval(t_ternary(X,Y,_Z),Env,NewEnv) :- com1_eval(X,Env,Env1,R),R=true,
-    %com_eval(Y,Env1,NewEnv).
-%com1_eval(t_ternary(X,_Y,Z),Env,NewEnv) :- com1_eval(X,Env,Env1,R),R=false,
-    %com_eval(Z,Env1,NewEnv).
-              
->>>>>>> 4e09c95dcc14554dd999f696f934885b03701dba
 %while evaluation
 com1_eval(t_while(X,Y),Env,NewEnv) :- bool_eval(X,Env,Bool),
     ( Bool=true ->
@@ -168,13 +156,6 @@ com1_eval(t_for_javatype(X,Y,Z),Env,NewEnv) :- com1_eval(X,Env,Env1),
     ;   Bool=false ->  
         write('end for javatype loop')
     ).
-<<<<<<< HEAD
-=======
-
-%for loop evaluation
-%com1_eval(t_for_javatype(X,Y,Z),Env,NewEnv) :- com1_eval(X,Env,Env1),com1_eval(Y,Env1,Env2),
-    %com_eval(Z,Env2,NewEnv).
->>>>>>> 4e09c95dcc14554dd999f696f934885b03701dba
 
 %evaluate the boolean
 bool_eval(true,_Env,true).

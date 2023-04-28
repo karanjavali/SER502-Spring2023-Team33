@@ -56,10 +56,6 @@ command1(t_print(X)) --> [print], expression(X).
 
 command1(X) --> block(X).
 
-<<<<<<< HEAD
-=======
-expression(t_relational(X,Y,Z)) --> expression(X), relational(Y), expression(Z).
->>>>>>> 4e09c95dcc14554dd999f696f934885b03701dba
 expression(t_add(X,Y)) --> expression(X), [+], temp1(Y).
 expression(t_sub(X,Y)) --> expression(X), [-], temp1(Y).
 expression(t_boolean(X)) --> boolean(X).
@@ -77,9 +73,4 @@ variable(t_var(X)) --> [X], { atom(X) }.
 
 digit(t_digit(I)) --> [I], { number(I) }.
 
-<<<<<<< HEAD
 string(t_string(S)) --> [S], { atom(S) }.
-=======
-string(t_string(S)) --> [S], { atom(S) }.
-
->>>>>>> 4e09c95dcc14554dd999f696f934885b03701dba
