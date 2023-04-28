@@ -119,9 +119,29 @@ com1_eval(t_ternary(X,Y,_Z),Env,NewEnv) :- com1_eval(X,Env,Env1,R),R=true,
 com1_eval(t_ternary(X,_Y,Z),Env,NewEnv) :- com1_eval(X,Env,Env1,R),R=false,
     com_eval(Z,Env1,NewEnv).
 
+%while evaluation
+com1_eval(t_while(X,Y),Env,NewEnv) :- bool_eval(X,Env,Bool),
+    ( Bool=true ->
+        write('begin while'),
+        com_eval(Y,Env,NEnv),
+        com1_eval(t_while(X,Y),NEnv,NewEnv)
+    ; Bool=false ->
+        write('end while')
+    ).
+
 %for loop evaluation
-com1_eval(t_for_javatype(X,Y,Z),Env,NewEnv) :- com1_eval(X,Env,Env1),com1_eval(Y,Env1,Env2),
-    com_eval(Z,Env2,NewEnv).
+com1_eval(t_for_javatype(X,Y,Z),Env,NewEnv) :- com1_eval(X,Env,Env1),
+    bool_eval(Y,Env1,Bool),
+    (   Bool=true ->  
+        write('begin for javatype loop'),
+        com_eval(Z,Env1,NewEnv)
+    ;   Bool=false ->  
+        write('end for javatype loop')
+    ).
+
+%for loop evaluation
+%com1_eval(t_for_javatype(X,Y,Z),Env,NewEnv) :- com1_eval(X,Env,Env1),com1_eval(Y,Env1,Env2),
+    %com_eval(Z,Env2,NewEnv).
 
 %evaluate the boolean
 bool_eval(true,_Env,true).
