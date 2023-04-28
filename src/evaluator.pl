@@ -123,6 +123,7 @@ com1_eval(t_booleanEquality(X,Y,Z),Env,NewEnv,R) :-
 
 %com1_eval(t_conditional(X,Y,Z), Env, NewEnv) :- com1_eval(X,Env,Env1),
 %ternary evaluation
+
 com1_eval(t_ternary(X,Y,Z),Env,NewEnv) :- 
     bool_eval(X,Env,Bool),
     ( Bool=true ->
@@ -137,6 +138,7 @@ com1_eval(t_ternary(X,Y,Z),Env,NewEnv) :-
     ; R=false ->
         com_eval(Z,Env1,NewEnv)
     ).
+
 %while evaluation
 com1_eval(t_while(X,Y),Env,NewEnv) :- bool_eval(X,Env,Bool),
     ( Bool=true ->
