@@ -127,6 +127,15 @@ com1_eval(t_while(X,Y),Env,NewEnv) :- bool_eval(X,Env,Bool),
         write('end while')
     ).
 
+%print evaluation
+com1_eval(t_print(X),Env,_Env) :- 
+    write('begin print'),
+    eval_print(X,Env).
+
+eval_print(printExpr(X), Env):- expr_eval(X, Env, _Env, Val), write(Val),nl.
+eval_print(printExpr(X), Env):- bool_eval(X, Env,R), write(R),nl.
+eval_print(printString(X),_Env):- write(X),nl.
+
 %for loop evaluation
 com1_eval(t_for_javatype(X,Y,Z),Env,NewEnv) :- com1_eval(X,Env,Env1),
     bool_eval(Y,Env1,Bool),
