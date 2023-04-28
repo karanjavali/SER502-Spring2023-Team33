@@ -117,19 +117,15 @@ com1_eval(t_ternary(X,Y,Z),Env,NewEnv) :-
     ).
 %while evaluation
 com1_eval(t_while(X,Y),Env,NewEnv) :- bool_eval(X,Env,Bool),
-     write(Env),
     ( Bool=true ->
-        write('begin while'),
         com_eval(Y,Env,NEnv),
         com1_eval(t_while(X,Y),NEnv,NewEnv)
     ; Bool=false ->
-    	NewEnv = Env,
-        write('end while')
+    	NewEnv = Env
     ).
 
 %print evaluation
 com1_eval(t_print(X),Env,_Env) :- 
-    write('begin print'),
     eval_print(X,Env).
 
 eval_print(printExpr(X), Env):- expr_eval(X, Env, _Env, Val), write(Val),nl.
@@ -140,12 +136,10 @@ eval_print(printString(X),_Env):- write(X),nl.
 com1_eval(t_for_javatype(X,Y,Z),Env,NewEnv) :- com1_eval(X,Env,Env1),
     bool_eval(Y,Env1,Bool),
     (   Bool=true ->  
-        write('begin for javatype loop'),
         com_eval(Z,Env1,Env2),
         com1_eval(t_for_javatype(X,Y,Z),Env2,NewEnv)
     ;   Bool=false ->  
-    	NewEnv = Env1,
-        write('end for javatype loop')
+    	NewEnv = Env1
     ).
 
 %python for loop evaluation
@@ -154,10 +148,8 @@ com1_eval(t_for_pythontype(W,t_digit(Start),t_digit(End),Z),Env1,NewEnv) :-
         % If Start is greater than End, just return the original environment
         NewEnv = Env1
     ; % Otherwise, iterate from Start to End
-        write('Processing iteration: '), write(Start), nl,
         com_eval(Z,Env1,Env2),
         Next is Start + 1,
-        write(Next),
         com1_eval(t_for_pythontype(W,t_digit(Next),t_digit(End),Z),Env2, NewEnv)
     ).
 
@@ -166,10 +158,9 @@ bool_eval(true,_Env,true).
 bool_eval(false,_Env,false).
 bool_eval(t_booleanEquality(X,Y,Z),Env,R) :- 
     eval_num(X, Env, Id),
-    lookup(Id,Env,Val1),nl,
-    expr_eval(Z,Env,Env,Val2), nl, nl,
-    relation_eval(Y,Val1,Val2,R),
-    write(R).
+    lookup(Id,Env,Val1),
+    expr_eval(Z,Env,Env,Val2),
+    relation_eval(Y,Val1,Val2,R).
 bool_eval(t_booleanNotEquality(X),Env,true):- bool_eval(X,Env,Bool), Bool = false.
 bool_eval(t_booleanNotEquality(X),Env,false):- bool_eval(X,Env,Bool), Bool = true.
 
