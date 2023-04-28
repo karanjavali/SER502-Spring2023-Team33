@@ -14,7 +14,8 @@ relational('||') --> ['||'].
 
 boolean(t_boolean(true)) --> [true].
 boolean(t_boolean(false)) --> [false].
-boolean(t_booleanEquality(X,Y,Z)) --> expression(X), relational(Y), expression(Z).
+boolean(t_booleanEquality(X,Y,Z)) --> [es], expression(X), [ee], relational(Y), [es], expression(Z), [ee].
+boolean(t_booleanEquality(X)) --> expression(X).
 boolean(t_booleanNotEquality(X)) --> [not], boolean(X).
 
 program(t_program(X)) --> block(X), ['.'].
@@ -56,6 +57,7 @@ command1(t_print(X)) --> [print], expression(X).
 
 command1(X) --> block(X).
 
+expression(t_relational(X,Y,Z)) --> expression(X), relational(Y), expression(Z).
 expression(t_add(X,Y)) --> expression(X), [+], temp1(Y).
 expression(t_sub(X,Y)) --> expression(X), [-], temp1(Y).
 expression(t_boolean(X)) --> boolean(X).
@@ -74,3 +76,4 @@ variable(t_var(X)) --> [X], { atom(X) }.
 digit(t_digit(I)) --> [I], { number(I) }.
 
 string(t_string(S)) --> [S], { atom(S) }.
+
