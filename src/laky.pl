@@ -2,7 +2,6 @@
 
 :- table expression/3, temp1/3, declare/3, expr_eval/3.
 
-
 relational(>) --> [>].
 relational(>=) --> [>=].
 relational(<) --> [<].
@@ -15,8 +14,7 @@ relational('||') --> ['||'].
 
 boolean(t_boolean(true)) --> [true].
 boolean(t_boolean(false)) --> [false].
-boolean(t_booleanEquality(X,Y,Z)) --> [es], expression(X), [ee], relational(Y), [es], expression(Z), [ee].
-boolean(t_booleanEquality(X)) --> expression(X).
+boolean(t_booleanEquality(X,Y,Z)) --> expression(X), relational(Y), expression(Z).
 boolean(t_booleanNotEquality(X)) --> [not], boolean(X).
 
 program(t_program(X)) --> block(X), ['.'].
@@ -41,6 +39,8 @@ declare1(t_bool(X)) --> [bool], variable(X).
 command(t_command(X,Y)) --> command1(X), [;], command(Y).
 command(X) --> command1(X).
 
+command1(t_assign(X,Y)) --> variable(X), [:=], boolean(Y).
+
 command1(t_assign(X,Y)) --> variable(X), [:=], expression(Y).
 
 command1(t_conditional(X,Y,Z)) --> [if], boolean(X), [then], command(Y), [else], command(Z), [endif].
@@ -56,10 +56,13 @@ command1(t_print(X)) --> [print], expression(X).
 
 command1(X) --> block(X).
 
-
+<<<<<<< HEAD
+=======
 expression(t_relational(X,Y,Z)) --> expression(X), relational(Y), expression(Z).
+>>>>>>> 4e09c95dcc14554dd999f696f934885b03701dba
 expression(t_add(X,Y)) --> expression(X), [+], temp1(Y).
 expression(t_sub(X,Y)) --> expression(X), [-], temp1(Y).
+expression(t_boolean(X)) --> boolean(X).
 expression(X) --> temp1(X).
 temp1(t_multiply(X,Y)) --> temp1(X), [*], temp2(Y).
 temp1(t_divide(X,Y)) --> temp1(X), [/], temp2(Y).
@@ -74,4 +77,9 @@ variable(t_var(X)) --> [X], { atom(X) }.
 
 digit(t_digit(I)) --> [I], { number(I) }.
 
+<<<<<<< HEAD
 string(t_string(S)) --> [S], { atom(S) }.
+=======
+string(t_string(S)) --> [S], { atom(S) }.
+
+>>>>>>> 4e09c95dcc14554dd999f696f934885b03701dba
