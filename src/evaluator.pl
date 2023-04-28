@@ -64,10 +64,11 @@ eval_declaration(t_const(_T),ENV, ENV).
 eval_declaration(t_string(_T),ENV, ENV).
 eval_declaration(t_bool(_T),ENV, ENV).
 
+eval_num(t_bool(X),_ENV,X).
 eval_num(t_var(X),_ENV,X).
 eval_num(t_digit(X),_ENV,X).
 eval_num(t_string(X),_ENV,X).
-eval_num(t_bool(X),_ENV,X).
+
 
 com_eval(t_command(X,Y),Env,NewEnv) :- 
      %write('t_command Env: '), write(Env), nl,
@@ -96,9 +97,11 @@ com1_eval(t_conditional(X,Y,Z), Env, NewEnv) :-
     ).
 %assignment evaluation
 com1_eval(t_assign(X,Y),Env,NewEnv) :-
-    %write("test assign"), nl,
+    write("test assign"), nl,
     eval_num(X, Env, Id), nl,
     %lookup(Id, Env, _),
+    write('Id: '), write(Id), nl,
+    write('Y: '), write(Y), nl,
     expr_eval(Y,Env,NEnv,Val),
     update(Id,NEnv,Val,NewEnv).
 
@@ -163,12 +166,13 @@ bool_eval(t_booleanNotEquality(X),Env,true):- bool_eval(X,Env,Bool), Bool = fals
 bool_eval(t_booleanNotEquality(X),Env,false):- bool_eval(X,Env,Bool), Bool = true.
 
 %new evaluate
-expr_eval(t_digit(X),ENV,ENV,X).
+expr_eval(t_boolean(X),ENV,ENV,X):- write("testboolean").
+expr_eval(t_digit(X),ENV,ENV,X):- write("testdigit").
 expr_eval(t_string(X),ENV,ENV,X).
-expr_eval(t_boolean(X),ENV,ENV,X).
 
 %evaluate the expression
 expr_eval(X, Env, Env, Val) :- 
+    write("hi"),
     %write("Env "), write(Env), nl,
     %write("X "), write(X), nl,
     eval_num(X, Env, Id),
@@ -246,7 +250,7 @@ lookup(Id,[H|T], Val):-
 lookup(Id,[],_Val):-write(Id),write(" not exist.").
 
 update(V,[],NewVal,[(V,NewVal)]):- write("cant not find").
-update(V,[(V,_)|T],NewVal,[(V,NewVal)|T]):- write(NewVal).
+update(V,[(V,_)|T],NewVal,[(V,NewVal)|T]).
 update(V,[H|T],NewVal,[H|NewEnv]):-H\=(V,_),update(V,T,NewVal,NewEnv).
 
 notContain(_Id, []).

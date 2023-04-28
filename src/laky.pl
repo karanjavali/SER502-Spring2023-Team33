@@ -2,12 +2,11 @@
 
 :- table expression/3, temp1/3, declare/3, expr_eval/3.
 
-
 relational(>) --> [>].
 relational(>=) --> [>=].
 relational(<) --> [<].
 relational(<=) --> [<=].
-relational(:=) --> [:=].
+relational(==) --> [==].
 relational('!=') --> ['!='].
 relational(!) --> [!].
 relational(&&) --> [&&].
@@ -40,6 +39,8 @@ declare1(t_bool(X)) --> [bool], variable(X).
 command(t_command(X,Y)) --> command1(X), [;], command(Y).
 command(X) --> command1(X).
 
+command1(t_assign(X,Y)) --> variable(X), [:=], boolean(Y).
+
 command1(t_assign(X,Y)) --> variable(X), [:=], expression(Y).
 
 command1(t_conditional(X,Y,Z)) --> [if], boolean(X), [then], command(Y), [else], command(Z), [endif].
@@ -55,9 +56,9 @@ command1(t_print(X)) --> [print], expression(X).
 
 command1(X) --> block(X).
 
-
 expression(t_add(X,Y)) --> expression(X), [+], temp1(Y).
 expression(t_sub(X,Y)) --> expression(X), [-], temp1(Y).
+expression(t_boolean(X)) --> boolean(X).
 expression(X) --> temp1(X).
 temp1(t_multiply(X,Y)) --> temp1(X), [*], temp2(Y).
 temp1(t_divide(X,Y)) --> temp1(X), [/], temp2(Y).
@@ -73,4 +74,3 @@ variable(t_var(X)) --> [X], { atom(X) }.
 digit(t_digit(I)) --> [I], { number(I) }.
 
 string(t_string(S)) --> [S], { atom(S) }.
-
