@@ -146,6 +146,7 @@ com1_eval(t_while(X,Y),Env,NewEnv) :- bool_eval(X,Env,Bool),
         com_eval(Y,Env,NEnv),
         com1_eval(t_while(X,Y),NEnv,NewEnv)
     ; Bool=false ->
+        NewEnv = Env,
         write('end while')
     ).
 
