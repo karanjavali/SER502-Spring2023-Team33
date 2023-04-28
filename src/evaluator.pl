@@ -128,7 +128,7 @@ com1_eval(t_while(X,Y),Env,NewEnv) :- bool_eval(X,Env,Bool),
     ).
 
 %print evaluation
-com1_eval(t_print(X),Env,_Env) :- 
+com1_eval(t_print(X),Env,Env) :- 
     write('begin print'),
     eval_print(X,Env).
 
