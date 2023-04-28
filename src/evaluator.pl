@@ -123,7 +123,6 @@ com1_eval(t_booleanEquality(X,Y,Z),Env,NewEnv,R) :-
 
 %com1_eval(t_conditional(X,Y,Z), Env, NewEnv) :- com1_eval(X,Env,Env1),
 %ternary evaluation
-
 com1_eval(t_ternary(X,Y,Z),Env,NewEnv) :- 
     bool_eval(X,Env,Bool),
     ( Bool=true ->
@@ -138,15 +137,15 @@ com1_eval(t_ternary(X,Y,Z),Env,NewEnv) :-
     ; R=false ->
         com_eval(Z,Env1,NewEnv)
     ).
-
 %while evaluation
 com1_eval(t_while(X,Y),Env,NewEnv) :- bool_eval(X,Env,Bool),
+     write(Env),
     ( Bool=true ->
         write('begin while'),
         com_eval(Y,Env,NEnv),
         com1_eval(t_while(X,Y),NEnv,NewEnv)
     ; Bool=false ->
-        NewEnv = Env,
+    	NewEnv = Env,
         write('end while')
     ).
 
@@ -158,6 +157,19 @@ com1_eval(t_for_javatype(X,Y,Z),Env,NewEnv) :- com1_eval(X,Env,Env1),
         com_eval(Z,Env1,NewEnv)
     ;   Bool=false ->  
         write('end for javatype loop')
+    ).
+
+%python for loop evaluation
+com1_eval(t_for_pythontype(W,t_digit(Start),t_digit(End),Z),Env1,NewEnv) :- 
+    (Start >= End ->
+        % If Start is greater than End, just return the original environment
+        NewEnv = Env1
+    ; % Otherwise, iterate from Start to End
+        write('Processing iteration: '), write(Start), nl,
+        com_eval(Z,Env1,Env2),
+        Next is Start + 1,
+        write(Next),
+        com1_eval(t_for_pythontype(W,t_digit(Next),t_digit(End),Z),Env2, NewEnv)
     ).
 
 %evaluate the boolean
