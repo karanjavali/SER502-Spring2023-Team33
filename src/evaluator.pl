@@ -208,12 +208,12 @@ temp2_eval(T,Env,Env,Val) :-
     lookup(Id, Env, Val).
 
 %evaluate relational
-relation_eval('>', X, Y, R) :- X > Y, R = true.
-relation_eval('>=', X, Y, R) :- X >= Y, R = true.
-relation_eval('<', X, Y, R) :- X < Y, R = true.
-relation_eval('<=', X, Y, R) :- X =< Y, R = true.
+relation_eval('>', X, Y, R) :- greaterCheck(X, Y, R).
+relation_eval('>=', X, Y, R) :- greaterEqualCheck(X, Y, R).
+relation_eval('<', X, Y, R) :- lowerCheck(X, Y, R).
+relation_eval('<=', X, Y, R) :- lowerEqualCheck(X, Y, R).
 relation_eval('==', X, Y, R) :- equalCheck(X, Y, R).
-relation_eval('!=', X, Y, R) :- X \= Y, R = true.
+relation_eval('!=', X, Y, R) :- notequalCheck(X, Y, R).
 relation_eval(!, _, _, R) :- R = false.
 relation_eval(&&,X,Y,R) :- X = true, Y = false, R = false.
 relation_eval(&&,X,Y,R) :- X = false, Y = false, R = false.
@@ -224,8 +224,18 @@ relation_eval('||',X,Y,R) :- X = false, Y = false, R = false.
 relation_eval('||',X,Y,R) :- X = false, Y = true, R = true.
 relation_eval('||',X,Y,R) :- X = true, Y = true, R = true.
 
+greaterCheck(X, Y, true):- X > Y.
+greaterCheck(X, Y, false):- X =< Y.
+greaterEqualCheck(X, Y, true):- X >= Y.
+greaterEqualCheck(X, Y, false):- X < Y.
+lowerCheck(X, Y, true):- X < Y.
+lowerCheck(X, Y, false):- X >= Y.
+lowerEqualCheck(X, Y, true):- X =< Y.
+lowerEqualCheck(X, Y, false):- X > Y.
 equalCheck(X, Y, true):- X == Y.
 equalCheck(X, Y, false):- dif(X, Y).
+notequalCheck(X, Y, true):- dif(X, Y).
+notequalCheck(X, Y, false):- X == Y.
 
 add(Id, NewVal,L,[(Id, NewVal)|L]).
 lookup(Id,[(Id,Val)|_], Val):- write("lookup").
