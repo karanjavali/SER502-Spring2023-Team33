@@ -2,6 +2,10 @@
 
 :- table expression/3, temp1/3, declare/3, expr_eval/3.
 
+:- discontiguous([
+    com1_eval/3
+]).
+
 relational(>) --> [>].
 relational(>=) --> [>=].
 relational(<) --> [<].
@@ -29,6 +33,7 @@ declare(X) --> declare1(X).
 declare1(t_const(X)) --> [int], variable(X).
 declare1(t_const(X,Y)) --> [int], variable(X), [:=], digit(Y).
 
+
 declare1(t_string(X,Y)) --> [string], variable(X), [:=], ['"'], string(Y), ['"'].
 declare1(t_string(X)) --> [string], variable(X).
 
@@ -43,6 +48,8 @@ command1(t_assign(X,Y)) --> variable(X), [:=], boolean(Y).
 
 command1(t_assign(X,Y)) --> variable(X), [:=], expression(Y).
 
+%command1(print(X)) --> [print], element(X), [;].
+
 command1(t_conditional(X,Y,Z)) --> [if], boolean(X), [then], command(Y), [else], command(Z), [endif].
 
 command1(t_ternary(X,Y,Z)) --> [tern], boolean(X), [?], command(Y), [:], command(Z), [endtern].
@@ -56,6 +63,7 @@ command1(t_print(X)) --> [print], expression(X).
 
 command1(X) --> block(X).
 
+
 expression(t_add(X,Y)) --> expression(X), [+], temp1(Y).
 expression(t_sub(X,Y)) --> expression(X), [-], temp1(Y).
 expression(t_boolean(X)) --> boolean(X).
@@ -65,13 +73,15 @@ temp1(t_divide(X,Y)) --> temp1(X), [/], temp2(Y).
 temp1(X) --> temp2(X).
 temp2(t_parenthesis(X)) --> ['('], expression(X), [')'].
 temp2(t_assign(X,Y)) --> variable(X), [:=], expression(Y).
-temp2(t_var(X)) --> [X], { atom(X) }.
+
 temp2(t_digit(X)) --> [X], { number(X) }.
-%temp2(t_string(X)) --> [X], { atom(X) }.
+%temp2(t_digit(I)) --> [X], { atom_number(X, I), integer(I) }.
+temp2(t_var(X)) --> [X], { atom(X) }.
 
 variable(t_var(X)) --> [X], { atom(X) }.
 
 digit(t_digit(I)) --> [I], { number(I) }.
 
-string(t_string(S)) --> [S], { atom(S) }.
+%digit(t_digit(I)) --> [X], { atom_number(X, I), integer(I) }.
 
+string(t_string(S)) --> [S], { atom(S) }.

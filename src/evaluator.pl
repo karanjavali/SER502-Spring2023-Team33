@@ -132,9 +132,10 @@ com1_eval(t_for_javatype(X,Y,Z),Env,NewEnv) :- com1_eval(X,Env,Env1),
     bool_eval(Y,Env1,Bool),
     (   Bool=true ->  
         write('begin for javatype loop'),
-        com_eval(Z,Env1,NewEnv)
+        com_eval(Z,Env1,Env2),
+        com1_eval(t_for_javatype(X,Y,Z),Env2,NewEnv)
     ;   Bool=false ->  
-    	NewEnv = Env,
+    	NewEnv = Env1,
         write('end for javatype loop')
     ).
 
