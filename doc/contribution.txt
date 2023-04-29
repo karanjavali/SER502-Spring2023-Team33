@@ -30,6 +30,7 @@ Worked on evaluator for expressions
 Karan Navin Javali:
 Worked on UI developent
 Worked to integrate UI with SWIPL
+Developed test cases
 
 Yunhan Qiao:
 Worked on evaluator for while loop
