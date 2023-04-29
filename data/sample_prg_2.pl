@@ -1,3 +1,3 @@
 begin 
-  string str := '"' ashsdakj '"' 
+  string str := " ashsdakj " 
 end.
