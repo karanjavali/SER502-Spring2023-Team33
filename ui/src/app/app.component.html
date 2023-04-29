@@ -13,4 +13,5 @@
 
 <h2 style="margin: 2rem;">Output</h2>
 
-<p [innerHtml]="output" style="margin: 2rem;"></p>
+
+<p *ngFor="let o of output" [innerHtml]="o" style="margin: 2rem;"></p>

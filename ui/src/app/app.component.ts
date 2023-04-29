@@ -14,17 +14,30 @@ export class AppComponent {
   }
 
   codeInput:any;
-  output = '';
+  output:any = [];
   ngOnInit() {
     this.codeInput = new FormControl('');
   }
 
   onRun() {
-    let replaced_str = this.codeInput.value.replaceAll(";", " ;");
-    let inputs = replaced_str.replace( /\n/g, " " ).split( " " );
-    // for(let i=0;i<inputs.length;i++) {
-    //   inpu
-    // }
+    let replace_strings:any = {
+      // "=": " = ", // implement later
+      ":=": " := ",
+      "+": " + ",
+      "-": " - ",
+      "/": " / ",
+      "*": " * ",
+      ";": " ; ",
+      ".": " . ",
+      "\n": " ",
+      "\t": " ", 
+    }
+    let replaced_str = this.codeInput.value;
+    for (let key of Object.keys(replace_strings)) {
+      replaced_str = replaced_str.replaceAll(key, replace_strings[key]); 
+    }
+    replaced_str.replaceAll("")
+    let inputs = replaced_str.split( " " );
     let i=0;
     while(i<inputs.length) {
       inputs[i] = inputs[i].trim();
@@ -33,11 +46,21 @@ export class AppComponent {
         
         inputs.splice(i,1);
       }
-      i++;
+      else {
+        i++;
+      }
     }
     this.api.post("http://127.0.0.1:5000",{args:inputs}).subscribe((res:any) => {
       console.log(res);
-      this.output = res.parse_tree + ', Z=' + res.output;
+      let outputs = res.res;
+      this.output = outputs.split("\r\n");
+      if(typeof(this.output) == "string") {
+        this.output = [];
+      }
+      else {
+        this.output.pop();
+      }
+      
     })
 
   }

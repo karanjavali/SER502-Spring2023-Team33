@@ -1,5 +1,6 @@
 from flask import Flask, Response, request
 import subprocess
+import json
 app = Flask(__name__)
 
 @app.route("/", methods=['POST'])
@@ -20,7 +21,22 @@ def execute_query():
     print('parse tree -> ',eval_output)
     print('parse tree err -> ',eval_error)
 
-    return  eval_output
+
+    # 200 -> good
+    # 400 -> errors
+
+    output_data = {
+        'status': 200,
+        'res': '',
+    }
+
+    if eval_error != '':
+        output_data['res'] = eval_error
+        output_data['status'] = 400
+    else:
+        output_data['res'] = eval_output.strip()
+    
+    return output_data
 
 def create_executables():
-        subprocess.run(['swipl.exe','-o','laky.exe','-g','main','-c','../src/laky.pl'])
+    subprocess.run(['swipl.exe','-o','laky.exe','-g','main','-c','../src/laky.pl'])

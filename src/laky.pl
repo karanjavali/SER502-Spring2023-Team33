@@ -341,3 +341,22 @@ notContain(Id, [(Id,_)|_]) :-
 notContain(Id, [(Id1,_)|T]) :-
     Id \= Id1,
     notContain(Id, T).
+
+main :-
+    current_prolog_flag(argv, Argv),
+    
+    process_args(Argv, ArgsWithInt),
+    call(program(P,ArgsWithInt,[])),
+    call(program_eval(P,Z)),
+    nl,
+    print(Z).
+
+% There will be integers in the arguments. Convert them to int,
+process_args([], []).
+process_args([Arg|Args], [IntArg|IntArgs]) :-
+    (   atom_number(Arg, IntArg)
+    ->  true
+    ;   
+        IntArg = Arg
+    ),
+    process_args(Args, IntArgs).
