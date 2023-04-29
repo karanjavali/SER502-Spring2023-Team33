@@ -33,7 +33,8 @@ export class AppComponent {
       "\t": " ",
       ">=": " >= ",
       "<=": " <= ",
-      "\"": " \" "
+      "\"": " \" ",
+      "==": " == "
     }
     let replaced_str = this.codeInput.value;
     for (let key of Object.keys(replace_strings)) {
