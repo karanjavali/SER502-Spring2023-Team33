@@ -28,7 +28,7 @@ Worked on evaluator for relational operators
 Worked on evaluator for expressions
 
 Karan Navin Javali:
-Worked on UI developent
+Worked on UI developent and backend
 Worked to integrate UI with SWIPL
 Developed test cases
 
