@@ -2,9 +2,9 @@
 
 :- table expression/3, temp1/3, declare/3, expr_eval/3.
 
-:- discontiguous([
-    com1_eval/3
-]).
+:- discontiguous com1_eval/3.
+
+:- discontiguous command1/3.
 
 relational(>) --> [>].
 relational(>=) --> [>=].
