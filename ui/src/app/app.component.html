@@ -1,0 +1,21 @@
+
+<mat-toolbar color="primary" style="justify-content: center; width: 100%;" >
+    <span>LAKY</span>
+</mat-toolbar>
+
+
+<mat-form-field class="example-full-width" style="margin:2%;width: 96%;" [formControl]="codeInput" name="codeInput" ngDefaultControl>
+  <mat-label>Enter your code</mat-label>
+  <textarea matInput placeholder="Enter your code" rows="20" ></textarea>
+</mat-form-field>
+
+<button mat-flat-button color="primary" style="margin: 2rem; margin-top:0; width: 25%;" (click)="onRun();">Run</button>
+
+<h2 style="margin: 2rem;">Output</h2>
+
+<div style="margin: 2rem;">
+  <p *ngIf="status == 200" style="color: greenyellow;"> Program ran successfully </p>
+  <p *ngIf="status == 400" style="color: red;"> ERROR! </p>
+  <p *ngFor="let o of output" [innerHtml]="o" ></p>
+</div>
+
