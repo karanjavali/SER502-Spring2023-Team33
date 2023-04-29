@@ -23,19 +23,20 @@ Information for the interpreter to be used, parsing techniques, and Abstract syn
 MILESTONE 2:
 
 Li Che Hsu:
-Work on evaluator
-Work on making SWIPL file executable
-Work on PPT
+Worked on evaluator for conditional statements
+Worked on evaluator for relational operators
+Worked on evaluator for expressions
 
 Karan Navin Javali:
-Work on UI in Angular.js
-Work on integrating SWIPL with Angular.js
+Worked on UI developent
+Worked to integrate UI with SWIPL
 
 Yunhan Qiao:
-Work on evaluator
-Work on making swipl file executable
-Work on YouTube video
+Worked on evaluator for while loop
+Worked on evaluator for for loop (both python like and java like)
+Worked on evaluator for printing
 
 Aaditya Muley:
-Work on changing the grammar according to the Milestone 1 comments form grader - many corrections required
-Work on the Parse Tree generator (lexiacal analyzer)
+Worked on changing the grammar according to the Milestone 1 comments form grader - many corrections and changes required
+Worked on the entire Parse Tree generator (intermidiate code generation)
+Worked on creating PPT
