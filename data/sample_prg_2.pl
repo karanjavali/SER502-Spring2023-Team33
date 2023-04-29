@@ -1,4 +1,4 @@
 begin 
-  string str := " ashsdakj ";
+  string str := "ashsdakj";
   print str
 end.
