@@ -35,4 +35,18 @@ Steps -
 
 3. Prolog - Make sure that SWIPL is installed
 
+
+## One line bash script to run parser and evaluator:
+THE UI WILL NOT WORK WITH ONE BASH SCRIPT LINE. 
+Please note that to execute the program in ONE LINE you need to go into the src folder and directly execute the laky.pl file as such:
+```
+cd src/
+swipl laky.pl
+```
+Once this is run you need to give the sample programs as input queries directly like this:
+```
+:- program(P,[begin, int, x, :=, 0, ;, int, i,  ;, for, i, inrange, 2, 5,'{', x, :=, x, +, 1,'}', endforpython, end, .],[]),write(P),program_eval(P,X).
+```
+The sample programs need commas added between every token!!!
+
 ## YouTube Video:
