@@ -9,6 +9,7 @@ import { ApiService } from './services/api.service';
 })
 export class AppComponent {
   
+  
   constructor(private api:ApiService) {
 
   }
@@ -20,6 +21,8 @@ export class AppComponent {
   }
   status = 0;
   onRun() {
+    
+    // we need tokens to be separated by whitespace. Add whitespace manually around tokens which are commonly used without spaces.
     let replace_strings:any = {
       // "=": " = ", // implement later
       ":=": " := ",
@@ -40,9 +43,12 @@ export class AppComponent {
     for (let key of Object.keys(replace_strings)) {
       replaced_str = replaced_str.replaceAll(key, replace_strings[key]); 
     }
-    replaced_str.replaceAll("")
+    
+    // split tokens by whitespace
     let inputs = replaced_str.split( " " );
     let i=0;
+    
+    // trim and remove empty tokens generated
     while(i<inputs.length) {
       inputs[i] = inputs[i].trim();
       if (inputs[i].length == 0) {
@@ -53,9 +59,12 @@ export class AppComponent {
         i++;
       }
     }
+    
+    // call backend and make post request. send captured args and get response
     this.api.post("http://127.0.0.1:5000",{args:inputs}).subscribe((res:any) => {
       let outputs = res.res;
       this.status = res.status;
+      // process output to display in ui
       this.output = outputs.split("\r\n");
       if(typeof(this.output) == "string") {
         this.output = [];
