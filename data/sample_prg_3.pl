@@ -5,8 +5,8 @@ begin
   y := 7 ; 
   if x '>' y 
     then 
-      z := true 
+      print x
     else 
-      z := false 
+      print y 
       endif 
 end.
