@@ -33,5 +33,6 @@ Steps -
 3. run the command - pip install -r requirements.txt
 4. run the command - flask run
 
+3. Prolog - Make sure that SWIPL is installed
 
 ## YouTube Video:
