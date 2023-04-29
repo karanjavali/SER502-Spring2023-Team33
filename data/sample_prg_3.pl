@@ -3,7 +3,7 @@ begin
   int y ; 
   bool z ; 
   y := 7 ; 
-  if x '>' y 
+  if x > y 
     then 
       print x
     else 
