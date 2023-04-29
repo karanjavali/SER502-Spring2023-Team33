@@ -13,5 +13,9 @@
 
 <h2 style="margin: 2rem;">Output</h2>
 
+<div style="margin: 2rem;">
+  <p *ngIf="status == 200" style="color: greenyellow;"> Program ran successfully </p>
+  <p *ngIf="status == 400" style="color: red;"> ERROR! </p>
+  <p *ngFor="let o of output" [innerHtml]="o" ></p>
+</div>
 
-<p *ngFor="let o of output" [innerHtml]="o" style="margin: 2rem;"></p>

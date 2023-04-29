@@ -1,4 +1,4 @@
-:- use_rendering(svgtree).
+% :- use_rendering(svgtree).
 
 :- table expression/3, temp1/3, declare/3, expr_eval/3.
 

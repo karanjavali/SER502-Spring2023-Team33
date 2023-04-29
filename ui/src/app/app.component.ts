@@ -18,7 +18,7 @@ export class AppComponent {
   ngOnInit() {
     this.codeInput = new FormControl('');
   }
-
+  status = 0;
   onRun() {
     let replace_strings:any = {
       // "=": " = ", // implement later
@@ -30,7 +30,9 @@ export class AppComponent {
       ";": " ; ",
       ".": " . ",
       "\n": " ",
-      "\t": " ", 
+      "\t": " ",
+      ">=": " >= ",
+      "<=": " <= "
     }
     let replaced_str = this.codeInput.value;
     for (let key of Object.keys(replace_strings)) {
@@ -53,6 +55,7 @@ export class AppComponent {
     this.api.post("http://127.0.0.1:5000",{args:inputs}).subscribe((res:any) => {
       console.log(res);
       let outputs = res.res;
+      this.status = res.status;
       this.output = outputs.split("\r\n");
       if(typeof(this.output) == "string") {
         this.output = [];
